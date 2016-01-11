@@ -77,6 +77,12 @@
 </property>
 
 <property>
+  <name>zeppelin.notebook.s3.sse</name>
+  <value>false</value>
+  <description>whether to use AES256 server-side encryption (SSE) for S3 object storage</description>
+</property>
+
+<property>
   <name>zeppelin.notebook.storage</name>
   <value>org.apache.zeppelin.notebook.repo.S3NotebookRepo</value>
   <description>notebook persistence layer implementation</description>
