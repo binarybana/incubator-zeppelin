@@ -47,6 +47,7 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -73,6 +74,7 @@ public class S3NotebookRepo implements NotebookRepo {
   private AmazonS3 s3client = new AmazonS3Client(new DefaultAWSCredentialsProviderChain());
   private static String bucketName = "";
   private String user = "";
+  private String s3SSE = "";
 
   private ZeppelinConfiguration conf;
 
@@ -80,6 +82,7 @@ public class S3NotebookRepo implements NotebookRepo {
     this.conf = conf;
     user = conf.getUser();
     bucketName = conf.getBucketName();
+    s3SSE = conf.getSSE();
   }
 
   @Override
@@ -167,7 +170,13 @@ public class S3NotebookRepo implements NotebookRepo {
 
     writer.write(json);
     writer.close();
-    s3client.putObject(new PutObjectRequest(bucketName, key, file));
+    PutObjectRequest request = new PutObjectRequest(bucketName, key, file);
+    if (s3SSE == "AES256") {
+      ObjectMetadata objectMetadata = new ObjectMetadata();
+      objectMetadata.setSSEAlgorithm(ObjectMetadata.AES_256_SERVER_SIDE_ENCRYPTION);
+      request.setMetadata(objectMetadata);
+    }
+    s3client.putObject(request);
   }
 
   @Override
